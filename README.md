@@ -1,5 +1,15 @@
 # i-am-a-surgeon
 
+<center>
+
+![license](https://img.shields.io/badge/license-GPLv3-blue?style=for-the-badge)
+![bun](https://img.shields.io/badge/needs-bun-black?logo=bun&logoColor=white&style=for-the-badge)
+![windows](https://img.shields.io/badge/windows-support--nah-lightgrey?style=for-the-badge)
+![breaks things](https://img.shields.io/badge/may_break-your_build-critical?style=for-the-badge)
+![prod ready](https://img.shields.io/badge/production_ready-hell_no-critical?style=for-the-badge)
+</center>
+
+
 > [!WARNING]
 > This was done as a half-joke, half-serious attempt at squeezing every last bit out of an Astro + Svelte build. If it’s not obvious already: **THIS IS NOT MEANT FOR PRODUCTION.**
 
