@@ -8,7 +8,33 @@ import { rename as moveFile, rm } from "node:fs/promises"
 import path, { basename, dirname, join } from "node:path"
 import type { AstroIntegration } from "astro"
 
-export function IAmASurgeonPlugin(): AstroIntegration {
+export type Options = {
+  fontCleaner?: boolean
+  removeUnusedCssVariables?: boolean
+  compressCssClasses?: boolean
+  compressCssVariables?: boolean
+  convertOklabToHex?: boolean
+  stripErrorMessages?: boolean
+  extraTerseHtml?: boolean
+  leStupid?: boolean
+  extraTerse?: boolean
+  compressFileNames?: boolean
+}
+
+export function IAmASurgeonPlugin(
+  options: Options = {
+    fontCleaner: true,
+    removeUnusedCssVariables: true,
+    compressCssClasses: true,
+    compressCssVariables: true,
+    convertOklabToHex: true,
+    stripErrorMessages: true,
+    extraTerseHtml: true,
+    leStupid: true,
+    extraTerse: true,
+    compressFileNames: true,
+  }
+): AstroIntegration {
   return {
     name: "astro:i-am-a-surgeon",
     hooks: {
@@ -21,17 +47,18 @@ export function IAmASurgeonPlugin(): AstroIntegration {
 
         const size = await $`du -b dist | tail -n 1`.text().then(parseInt)
 
-        await fontCleaner(root, files)
-        await removeUnusedCssVariables(files)
-        await compressCssClasses(files)
-        await compressCssVariables(files)
-        await convertOklabToHex(files)
-        await stripErrorMessages(files)
-        await extraTerseHtml(files)
-        await leStupid(files)
-        await extraTerse(files)
+        options.fontCleaner && (await fontCleaner(root, files))
+        options.removeUnusedCssVariables &&
+          (await removeUnusedCssVariables(files))
+        options.compressCssClasses && (await compressCssClasses(files))
+        options.compressCssVariables && (await compressCssVariables(files))
+        options.convertOklabToHex && (await convertOklabToHex(files))
+        options.stripErrorMessages && (await stripErrorMessages(files))
+        options.extraTerseHtml && (await extraTerseHtml(files))
+        options.leStupid && (await leStupid(files))
+        options.extraTerse && (await extraTerse(files))
 
-        await compressFileNames(files)
+        options.compressFileNames && (await compressFileNames(files))
 
         const finalSize = await $`du -b dist | tail -n 1`.text().then(parseInt)
 
