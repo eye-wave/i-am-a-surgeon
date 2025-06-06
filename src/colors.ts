@@ -5,7 +5,9 @@ export function oklabToHex(color: string) {
   const col = rgb(color)
   if (!col) return
 
-  const channels = [col.r, col.g, col.b].map(c => (Math.min(Math.max(0.0, c), 1.0) * 255) | 0)
+  const channels = [col.r, col.g, col.b].map(
+    c => (Math.min(Math.max(0.0, c), 1.0) * 255) | 0
+  )
   const canBeShort = channels.every(c => compressChannel(c).length === 1)
 
   const threshold = canBeShort ? 10 : 0

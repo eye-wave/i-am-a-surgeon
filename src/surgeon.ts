@@ -14,7 +14,10 @@ export function IAmASurgeonPlugin(): AstroIntegration {
     hooks: {
       "astro:build:done": async ({ dir }) => {
         const root = dir.pathname
-        const files = (await $`find ${root} -type f`.text()).split("\n").filter(Boolean).sort()
+        const files = (await $`find ${root} -type f`.text())
+          .split("\n")
+          .filter(Boolean)
+          .sort()
 
         const size = await $`du -b dist | tail -n 1`.text().then(parseInt)
 
@@ -50,12 +53,17 @@ async function fontCleaner(root: string, files: string[]) {
   const fontNames: string[] = []
 
   for await (const [_, contents] of filesIterate(files, [".css"])) {
-    for (const [, name] of contents.matchAll(/@font-face{.*?font-family:([^;]+).*?src:url\(([^)]+)\).*?}/g)) {
+    for (const [, name] of contents.matchAll(
+      /@font-face{.*?font-family:([^;]+).*?src:url\(([^)]+)\).*?}/g
+    )) {
       fontNames.push(name + ".ttf")
     }
   }
 
-  const fonts = (await $`find ${root} -type f -name '*.ttf'`.text()).split("\n").filter(Boolean).sort()
+  const fonts = (await $`find ${root} -type f -name '*.ttf'`.text())
+    .split("\n")
+    .filter(Boolean)
+    .sort()
 
   for await (const [filepath] of filesIterate(fonts, [".ttf"])) {
     const shouldInclude = fontNames.some(f => filepath.endsWith(f))
@@ -132,7 +140,10 @@ async function compressCssClasses(files: string[]) {
 // Convert OKlab to Hex
 async function convertOklabToHex(files: string[]) {
   for await (const [filepath, contents] of filesIterate(files)) {
-    const replacement = contents.replace(/(oklab|oklch)\([^)]+\)/g, match => oklabToHex(match) ?? match)
+    const replacement = contents.replace(
+      /(oklab|oklch)\([^)]+\)/g,
+      match => oklabToHex(match) ?? match
+    )
 
     await writeFile(filepath, replacement)
   }
@@ -217,7 +228,10 @@ async function leStupid(files: string[]) {
       .replaceAll("before-hydration-url", "d")
       .replaceAll("data-astro-template", "e")
       .replaceAll("ssr", "f")
-      .replace(/\d:\w=>(new )?(BigInt|Uint8Array|Uint16Array|Uint32Array|RegExp|Date)\(\w\),/g, "")
+      .replace(
+        /\d:\w=>(new )?(BigInt|Uint8Array|Uint16Array|Uint32Array|RegExp|Date)\(\w\),/g,
+        ""
+      )
       .replace(/astro-island\s*uid="[^"]+"/g, "astro-island")
       .replace(/opts="{[^}]+}"/g, "")
       .replaceAll('props="{}"', "")

@@ -18,6 +18,11 @@
   "scripts": {
     "format": "biome format . --write"
   },
+  "main": "./src/surgeon.ts",
+  "module": "./src/surgeon.ts",
+  "exports": {
+    ".": "./src/surgeon.ts"
+  },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@types/culori": "^4.0.0",
