@@ -2,7 +2,10 @@ import { readFile } from "node:fs/promises"
 import { minify } from "terser"
 import { JS_MINIFY_OPTIONS } from "./const"
 
-export async function* filesIterate(files: string[], accepted = [".js", ".css", ".html"]) {
+export async function* filesIterate(
+  files: string[],
+  accepted = [".js", ".css", ".html"]
+): AsyncGenerator<[string, string]> {
   for (const filepth of files) {
     const shouldInclude = accepted.some(ext => filepth.endsWith(ext))
     if (!shouldInclude) continue

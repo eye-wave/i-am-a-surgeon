@@ -196,7 +196,7 @@ async function extraTerseHtml(files: string[]) {
 
     let final = compact
     for (let i = 0; i < islands.length; i++) {
-      final = final.replace(`🐈🐈__ASTRO_ISLAND_${i}__🐈🐈`, islands[i])
+      final = final.replace(`🐈🐈__ASTRO_ISLAND_${i}__🐈🐈`, islands[i]!)
     }
 
     if (final.length < html.length) {
