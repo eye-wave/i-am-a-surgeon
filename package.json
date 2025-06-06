@@ -1,8 +1,7 @@
 {
   "name": "i-am-a-surgeon",
-  "version": "0.0.0",
+  "description": "astro build minifier with zero regard for sanity",
   "type": "module",
-  "description": "",
   "author": {
     "name": "_eyewave",
     "email": "89079979+eye-wave@users.noreply.github.com"

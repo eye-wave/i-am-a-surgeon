@@ -30,7 +30,7 @@ But if you want anyways:
 bun add -d github:eye-wave/i-am-a-surgeon
 ```
 
-And oh, if you're not using bun or a unix operating system the it won't work 😸
+And oh, if you're not using bun or a unix operating system then it won't work 😸
 
 ### License
 
