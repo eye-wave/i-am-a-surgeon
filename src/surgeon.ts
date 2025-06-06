@@ -21,20 +21,12 @@ export type Options = {
   compressFileNames?: boolean
 }
 
-export function IAmASurgeonPlugin(
-  options: Options = {
-    fontCleaner: true,
-    removeUnusedCssVariables: true,
-    compressCssClasses: true,
-    compressCssVariables: true,
-    convertOklabToHex: true,
-    stripErrorMessages: true,
-    extraTerseHtml: true,
-    leStupid: true,
-    extraTerse: true,
-    compressFileNames: true,
-  }
-): AstroIntegration {
+function opt(value?: boolean) {
+  if (value === undefined) return true
+  return value
+}
+
+export function IAmASurgeonPlugin(options?: Options): AstroIntegration {
   return {
     name: "astro:i-am-a-surgeon",
     hooks: {
@@ -47,18 +39,19 @@ export function IAmASurgeonPlugin(
 
         const size = await $`du -b dist | tail -n 1`.text().then(parseInt)
 
-        options.fontCleaner && (await fontCleaner(root, files))
-        options.removeUnusedCssVariables &&
+        opt(options?.fontCleaner) && (await fontCleaner(root, files))
+        opt(options?.removeUnusedCssVariables) &&
           (await removeUnusedCssVariables(files))
-        options.compressCssClasses && (await compressCssClasses(files))
-        options.compressCssVariables && (await compressCssVariables(files))
-        options.convertOklabToHex && (await convertOklabToHex(files))
-        options.stripErrorMessages && (await stripErrorMessages(files))
-        options.extraTerseHtml && (await extraTerseHtml(files))
-        options.leStupid && (await leStupid(files))
-        options.extraTerse && (await extraTerse(files))
+        opt(options?.compressCssClasses) && (await compressCssClasses(files))
+        opt(options?.compressCssVariables) &&
+          (await compressCssVariables(files))
+        opt(options?.convertOklabToHex) && (await convertOklabToHex(files))
+        opt(options?.stripErrorMessages) && (await stripErrorMessages(files))
+        opt(options?.extraTerseHtml) && (await extraTerseHtml(files))
+        opt(options?.leStupid) && (await leStupid(files))
+        opt(options?.extraTerse) && (await extraTerse(files))
 
-        options.compressFileNames && (await compressFileNames(files))
+        opt(options?.compressFileNames) && (await compressFileNames(files))
 
         const finalSize = await $`du -b dist | tail -n 1`.text().then(parseInt)
 
