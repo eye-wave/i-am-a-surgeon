@@ -2,6 +2,19 @@
   "name": "i-am-a-surgeon",
   "version": "0.0.0",
   "type": "module",
+  "description": "",
+  "author": {
+    "name": "_eyewave",
+    "email": "89079979+eye-wave@users.noreply.github.com"
+  },
+  "bugs": {
+    "url": "https://github.com/eye-wave/i-am-a-surgeon/issues"
+  },
+  "homepage": "https://github.com/eye-wave/i-am-a-surgeon#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eye-wave/i-am-a-surgeon.git"
+  },
   "scripts": {
     "format": "biome format . --write"
   },
@@ -16,5 +29,6 @@
     "html-minifier-terser": "^7.2.0",
     "terser": "^5.41.0"
   },
-  "trustedDependencies": ["@biomejs/biome"]
+  "trustedDependencies": ["@biomejs/biome"],
+  "license": "GPL-3.0-only"
 }
