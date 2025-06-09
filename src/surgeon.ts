@@ -1,5 +1,5 @@
-import { $, file as readFile, write as writeFile } from "bun"
-import { cssEncode, filesIterate, minifyJs } from "./utils"
+import { readFile, writeFile } from "node:fs/promises"
+import { cssEncode, dirSize, filesIterate, minifyJs, walkdir } from "./utils"
 import { HTML_MINIFY_OPTIONS } from "./const"
 import { load } from "cheerio"
 import { minify as htmlMinify } from "html-minifier-terser"
@@ -12,7 +12,10 @@ export type Options = {
   fontCleaner?: boolean
   removeUnusedCssVariables?: boolean
   compressCssClasses?: boolean
-  compressCssVariables?: boolean
+  compressCssVariables?: {
+    enabled?: boolean
+    ignoreVars?: string[]
+  }
   convertOklabToHex?: boolean
   stripErrorMessages?: boolean
   extraTerseHtml?: boolean
@@ -32,19 +35,19 @@ export function IAmASurgeonPlugin(options?: Options): AstroIntegration {
     hooks: {
       "astro:build:done": async ({ dir }) => {
         const root = dir.pathname
-        const files = (await $`find ${root} -type f`.text())
-          .split("\n")
-          .filter(Boolean)
-          .sort()
+        const files = await walkdir(root)
 
-        const size = await $`du -b dist | tail -n 1`.text().then(parseInt)
+        const size = await dirSize(root)
 
         opt(options?.fontCleaner) && (await fontCleaner(root, files))
         opt(options?.removeUnusedCssVariables) &&
           (await removeUnusedCssVariables(files))
         opt(options?.compressCssClasses) && (await compressCssClasses(files))
-        opt(options?.compressCssVariables) &&
-          (await compressCssVariables(files))
+        opt(options?.compressCssVariables?.enabled) &&
+          (await compressCssVariables(
+            files,
+            options?.compressCssVariables?.ignoreVars ?? []
+          ))
         opt(options?.convertOklabToHex) && (await convertOklabToHex(files))
         opt(options?.stripErrorMessages) && (await stripErrorMessages(files))
         opt(options?.extraTerseHtml) && (await extraTerseHtml(files))
@@ -53,7 +56,7 @@ export function IAmASurgeonPlugin(options?: Options): AstroIntegration {
 
         opt(options?.compressFileNames) && (await compressFileNames(files))
 
-        const finalSize = await $`du -b dist | tail -n 1`.text().then(parseInt)
+        const finalSize = await dirSize(root)
 
         console.log(size - finalSize, "bytes reduced")
       },
@@ -80,10 +83,7 @@ async function fontCleaner(root: string, files: string[]) {
     }
   }
 
-  const fonts = (await $`find ${root} -type f -name '*.ttf'`.text())
-    .split("\n")
-    .filter(Boolean)
-    .sort()
+  const fonts = files.filter(f => f.endsWith(".ttf"))
 
   for await (const [filepath] of filesIterate(fonts, [".ttf"])) {
     const shouldInclude = fontNames.some(f => filepath.endsWith(f))
@@ -117,7 +117,7 @@ async function removeUnusedCssVariables(files: string[]) {
 
   if (themeCss === null) return
 
-  let contents = await readFile(themeCss).text()
+  let contents = await readFile(themeCss, "utf-8")
   const rootBlocks = contents.match(/:root[^}]*{[^}]+}/g) ?? []
 
   for (const block of rootBlocks) {
@@ -136,7 +136,7 @@ async function removeUnusedCssVariables(files: string[]) {
 // ───────────────────────────────────────────────
 // Compress Svelte/Astro CSS classes
 async function compressCssClasses(files: string[]) {
-  let counter = -1
+  let counter = 0
   const classesMap = new Map<string, string>()
 
   for await (const [_, contents] of filesIterate(files, [".css"])) {
@@ -171,16 +171,16 @@ async function convertOklabToHex(files: string[]) {
 
 // ───────────────────────────────────────────────
 // Compress CSS variable names
-async function compressCssVariables(files: string[]) {
-  let counter = -1
+async function compressCssVariables(files: string[], ignore: string[] = []) {
+  let counter = 0
   const varMap = new Map<string, string>()
 
   for await (const [_, contents] of filesIterate(files)) {
-    const matches =
-      (contents
-        .match(/var\(--[\w-]+\)/g)
-        ?.map(a => a.match(/--[\w-]+/)?.[0])
-        .filter(Boolean) as string[]) ?? []
+    const matches = (
+      (contents.match(/var\(--[\w-]+/g)?.filter(Boolean) ?? [])?.map(
+        a => a.match(/--[\w-]+/)?.[0]
+      ) as string[]
+    ).filter(n => !(ignore.includes(n) || ignore.includes("--" + n)))
 
     for (const name of matches) {
       if (!varMap.has(name)) {
@@ -193,7 +193,7 @@ async function compressCssVariables(files: string[]) {
     let replacement = contents
 
     varMap.forEach((short, full) => {
-      replacement = replacement.replaceAll(full + ")", short + ")")
+      replacement = replacement.replaceAll("(" + full + ")", "(" + short + ")")
       replacement = replacement.replaceAll(full + ":", short + ":")
     })
     await writeFile(filepath, replacement)
@@ -204,7 +204,10 @@ async function compressCssVariables(files: string[]) {
 // Strip all Error messages
 async function stripErrorMessages(files: string[]) {
   for await (const [filepath, contents] of filesIterate(files)) {
-    const replacement = contents.replace(/throw new Error\([^)]+\)/g, 'throw""')
+    const replacement = contents.replace(
+      /throw new Error\(((?:[^()]+|\([^()]*\))*)\)/g,
+      'throw""'
+    )
 
     await writeFile(filepath, replacement)
   }

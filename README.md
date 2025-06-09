@@ -3,8 +3,6 @@
 <center>
 
 ![license](https://img.shields.io/badge/license-GPLv3-blue?style=for-the-badge)
-![bun](https://img.shields.io/badge/needs-bun-black?logo=bun&logoColor=white&style=for-the-badge)
-![windows](https://img.shields.io/badge/windows-support--nah-lightgrey?style=for-the-badge)
 ![breaks things](https://img.shields.io/badge/may_break-your_build-critical?style=for-the-badge)
 ![prod ready](https://img.shields.io/badge/production_ready-hell_no-critical?style=for-the-badge)
 </center>
@@ -42,7 +40,9 @@ But if you want anyways:
 bun add -d github:eye-wave/i-am-a-surgeon
 ```
 
-Oh, and if you’re not using **Bun** or a **Unix-based OS**, this won’t work 😸
+~~Oh, and if you’re not using **Bun** or a **Unix-based OS**, this won’t work 😸~~
+
+It **should** be crossplatform and work on node, but i haven't tested yet 🙀.
 
 ---
 
